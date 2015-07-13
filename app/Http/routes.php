@@ -12,4 +12,5 @@
 */
 
 $app->get('/', 'SAFEController@index');
-$app->get('/api/v1', 'SAFEController@index');
+$app->get('/api/v1/', 'SAFEController@index');
+$app->get('/api/v1/{plugin}/{termID}', 'SAFEController@exportPluginID');
