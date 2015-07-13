@@ -4,6 +4,7 @@ use Closure;
 use Exception;
 use ErrorException;
 use Monolog\Logger;
+use RuntimeException;
 use FastRoute\Dispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -136,6 +137,13 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     protected $dispatcher;
 
     /**
+     * The application namespace.
+     *
+     * @var string
+     */
+    protected $namespace;
+
+    /**
      * Create a new Lumen application instance.
      *
      * @param  string|null  $basePath
@@ -171,7 +179,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function version()
     {
-        return 'Lumen (5.1.1) (Laravel Components 5.1.*)';
+        return 'Lumen (5.1.2) (Laravel Components 5.1.*)';
     }
 
     /**
@@ -233,7 +241,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      * @param  bool   $force
      * @return \Illuminate\Support\ServiceProvider
      */
-    public function register($provider, $options = array(), $force = false)
+    public function register($provider, $options = [], $force = false)
     {
         if (!$provider instanceof ServiceProvider) {
             $provider = new $provider($this);
@@ -314,7 +322,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     }
 
     /**
-     * Send the exception to the handler and retunr the response.
+     * Send the exception to the handler and return the response.
      *
      * @param  Exception  $e
      * @return Response
@@ -357,7 +365,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      *
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
-    public function abort($code, $message = '', array $headers = array())
+    public function abort($code, $message = '', array $headers = [])
     {
         if ($code == 404) {
             throw new NotFoundHttpException($message);
@@ -373,7 +381,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      * @param  array   $parameters
      * @return mixed
      */
-    public function make($abstract, array $parameters = array())
+    public function make($abstract, array $parameters = [])
     {
         if (array_key_exists($abstract, $this->availableBindings) &&
             ! array_key_exists($this->availableBindings[$abstract], $this->ranServiceBinders)) {
@@ -444,6 +452,10 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     {
         $this->singleton('cache', function () {
             return $this->loadComponent('cache', 'Illuminate\Cache\CacheServiceProvider');
+        });
+
+        $this->singleton('cache.store', function () {
+            return $this->loadComponent('cache', 'Illuminate\Cache\CacheServiceProvider', 'cache.store');
         });
     }
 
@@ -1345,7 +1357,10 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     protected function sendThroughPipeline(array $middleware, Closure $then)
     {
-        if (count($middleware) > 0) {
+        $shouldSkipMiddleware = $this->bound('middleware.disable') &&
+                                        $this->make('middleware.disable') === true;
+
+        if (count($middleware) > 0 && ! $shouldSkipMiddleware) {
             return (new Pipeline($this))
                 ->send($this->make('request'))
                 ->through($middleware)
@@ -1396,6 +1411,42 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         $query = isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : '';
 
         return '/'.trim(str_replace('?'.$query, '', $_SERVER['REQUEST_URI']), '/');
+    }
+
+    /**
+     * Get the application namespace.
+     *
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function getNamespace()
+    {
+        if (!is_null($this->namespace)) {
+            return $this->namespace;
+        }
+
+        $composer = json_decode(file_get_contents($this->basePath().'/composer.json'), true);
+
+        foreach ((array) data_get($composer, 'autoload.psr-4') as $namespace => $path) {
+            foreach ((array) $path as $pathChoice) {
+                if (realpath($this->path()) == realpath($this->basePath().'/'.$pathChoice)) {
+                    return $this->namespace = $namespace;
+                }
+            }
+        }
+
+        throw new RuntimeException('Unable to detect application namespace.');
+    }
+
+    /**
+     * Get the path to the application "app" directory.
+     *
+     * @return string
+     */
+    public function path()
+    {
+        return $this->basePath.DIRECTORY_SEPARATOR.'app';
     }
 
     /**
@@ -1501,7 +1552,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     /**
      * Determine if the application is running in the console.
      *
-     * @return string
+     * @return bool
      */
     public function runningInConsole()
     {
@@ -1643,7 +1694,8 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function welcome()
     {
-        return "<html>
+        return "<!DOCTYPE html>
+            <html>
             <head>
                 <title>Lumen</title>
 
@@ -1689,7 +1741,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
                     </div>
                 </div>
             </body>
-        </html>
+            </html>
         ";
     }
 }

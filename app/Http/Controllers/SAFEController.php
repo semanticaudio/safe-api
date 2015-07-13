@@ -6,6 +6,8 @@ namespace App\Http\Controllers;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use Illuminate\Http\Request;
 
+use SoapBox\Formatter\Formatter;
+
 class SAFEController extends BaseController
 {
 	public function index(){
@@ -18,7 +20,7 @@ class SAFEController extends BaseController
      * 
      */
 	public function exportPluginID($plugin,$id){
-		switch (intval($plugin)) {
+		switch ($plugin) {
 			case "SAFECompressorAudioFeatureData":
 				return response()->json(\App\SAFECompressorAudioFeatureData::where('ID','=',$id)->get());
 				break;

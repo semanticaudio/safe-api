@@ -7,13 +7,13 @@
     "require": {
         "php": ">=5.5.9",
         "laravel/lumen-framework": "5.1.*",
-        "vlucas/phpdotenv": "~1.0"
+        "vlucas/phpdotenv": "~1.0",
+        "soapbox/laravel-formatter": "2.2"
     },
     "require-dev": {
         "phpunit/phpunit": "~4.0",
         "fzaninotto/faker": "~1.0",
-        "xethron/migrations-generator": "dev-l5",
-        "way/generators": "dev-feature/laravel-five-stable"
+        "soapbox/laravel-formatter": "2.2"
     },
     "autoload": {
         "psr-4": {
