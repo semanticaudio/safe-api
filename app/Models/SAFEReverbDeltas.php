@@ -4,14 +4,14 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class SAFEDistortionDeltas extends Model
+class SAFEReverbDeltas extends Model
 {
     /**
      * The database table used by the model.
      *
      * @var string
      */
-	protected $table = 'SAFEDistortionDeltas';
+	protected $table = 'SAFEReverbDeltas';
     
     /**
      * Indicates if the model should be timestamped.
@@ -26,7 +26,7 @@ class SAFEDistortionDeltas extends Model
      */
 
     public function userdata(){
-        return $this->belongsTo('\App\SAFEDistortionUserData','ID','ID');
+        return $this->belongsTo('\App\SAFEReverbUserData','ID','ID');
     }
 
 

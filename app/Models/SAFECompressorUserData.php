@@ -19,4 +19,19 @@ class SAFECompressorUserData extends Model
      * @var bool
      */
     public $timestamps = false;
+
+    /**
+     * Relationships
+     *
+     */
+
+    public function deltas(){
+        return $this->hasMany('\App\SAFECompressorDeltas','ID','ID');
+    }
+    public function deltadeltas(){
+        return $this->hasMany('\App\SAFECompressorDeltaDeltas','ID','ID');
+    }
+    public function audiofeaturedata(){
+        return $this->hasMany('\App\SAFECompressorAudioFeatureData','ID','ID');
+    }
 }

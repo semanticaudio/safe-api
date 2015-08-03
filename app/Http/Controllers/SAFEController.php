@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 
 use Laravel\Lumen\Routing\Controller as BaseController;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 use SoapBox\Formatter\Formatter;
 
@@ -16,61 +17,77 @@ class SAFEController extends BaseController
 
 	/**
      * 
- 	 * Version 1 - Super Hyper Alpha
+ 	 * Version 1 - 💣 Super Hyper Alpha 💣
      * 
      */
-	public function exportPluginID($plugin,$id){
-		switch ($plugin) {
-			case "SAFECompressorAudioFeatureData":
-				return response()->json(\App\SAFECompressorAudioFeatureData::where('ID','=',$id)->get());
+	public function exportPluginID($plugin,$id,$format){
+			switch ($plugin) {
+				case "SAFECompressor":
+					$deltas = \App\SAFECompressorUserData::find($id)->deltas;
+					$deltadeltas = \App\SAFECompressorUserData::find($id)->deltadeltas;
+					$audiofeaturedata = \App\SAFECompressorUserData::find($id)->audiofeaturedata;
+					$userdata = \App\SAFECompressorUserData::find($id);
+					break;
+				case "SAFEDistortion":
+					$deltas = \App\SAFEDistortionUserData::find($id)->deltas;
+					$deltadeltas = \App\SAFEDistortionUserData::find($id)->deltadeltas;
+					$audiofeaturedata = \App\SAFEDistortionUserData::find($id)->audiofeaturedata;
+					$userdata = \App\SAFEDistortionUserData::find($id);
+					break;
+				case "SAFEEqualiser":
+					$deltas = \App\SAFEEqualiserUserData::find($id)->deltas;
+					$deltadeltas = \App\SAFEEqualiserUserData::find($id)->deltadeltas;
+					$audiofeaturedata = \App\SAFEEqualiserUserData::find($id)->audiofeaturedata;
+					$userdata = \App\SAFEEqualiserUserData::find($id);
+					break;
+				case "SAFEReverb":
+					$deltas = \App\SAFEReverbUserData::find($id)->deltas;
+					$deltadeltas = \App\SAFEReverbUserData::find($id)->deltadeltas;
+					$audiofeaturedata = \App\SAFEReverbUserData::find($id)->audiofeaturedata;
+					$userdata = \App\SAFEReverbUserData::find($id);
+					break;
+				default:
+					return 'That plugin doesn\'t exist bro' ;
+					break;
+			}
+		$resultarray = [
+			'userdata' => $userdata,
+			"deltas" => [
+				"processed" => $deltas->filter(function($item){
+				    return $item->isProcessed();
+				})->values()->values(),
+				"unprocessed" => $deltas->filter(function($item){
+				    return !$item->isProcessed();
+				})->values()->values()
+			],
+			"deltadeltas" => [
+				"processed" => $deltadeltas->filter(function($item){
+				    return $item->isProcessed();
+				})->values()->values(),
+				"unprocessed" => $deltadeltas->filter(function($item){
+				    return !$item->isProcessed();
+				})->values()->values()
+			],
+			"audiofeaturedata" => [
+				"processed" => $audiofeaturedata->filter(function($item){
+				    return $item->isProcessed();
+				})->values()->values(),
+				"unprocessed" => $audiofeaturedata->filter(function($item){
+				    return !$item->isProcessed();
+				})->values()->values()
+			]
+		];
+
+		switch ($format) {
+			case 'json':
+				return json_encode($resultarray);
 				break;
-			case "SAFECompressorDeltaDeltas":
-				return response()->json(\App\SAFECompressorDeltaDeltas::where('ID','=',$id)->get());
+			case 'xml':
+				$formatter = Formatter::make(json_encode($resultarray), Formatter::JSON);
+				return response($formatter->toXml(),'200')->header('Content-Type', 'text/xml');
 				break;
-			case "SAFECompressorDeltas":
-				return response()->json(\App\SAFECompressorDeltas::where('ID','=',$id)->get());
-				break;
-			case "SAFECompressorUserData":
-				return response()->json(\App\SAFECompressorUserData::where('ID','=',$id)->get());
-				break;
-			case "SAFEDistortionAudioFeatureData":
-				return response()->json(\App\SAFEDistortionAudioFeatureData::where('ID','=',$id)->get());
-				break;
-			case "SAFEDistortionDeltaDeltas":
-				return response()->json(\App\SAFEDistortionDeltaDeltas::where('ID','=',$id)->get());
-				break;
-			case "SAFEDistortionDeltas":
-				return response()->json(\App\SAFEDistortionDeltas::where('ID','=',$id)->get());
-				break;
-			case "SAFEDistortionUserData":
-				return response()->json(\App\SAFEDistortionUserData::where('ID','=',$id)->get());
-				break;
-			case "SAFEEqualiserAudioFeatureData":
-				return response()->json(\App\SAFEEqualiserAudioFeatureData::where('ID','=',$id)->get());
-				break;
-			case "SAFEEqualiserDeltaDeltas":
-				return response()->json(\App\SAFEEqualiserDeltaDeltas::where('ID','=',$id)->get());
-				break;
-			case "SAFEEqualiserDeltas":
-				return response()->json(\App\SAFEEqualiserDeltas::where('ID','=',$id)->get());
-				break;
-			case "SAFEEqualiserUserData":
-				return response()->json(\App\SAFEEqualiserUserData::where('ID','=',$id)->get());
-				break;
-			case "SAFEReverbAudioDeltaDeltas":
-				return response()->json(\App\SAFEReverbAudioDeltaDeltas::where('ID','=',$id)->get());
-				break;
-			case "SAFEReverbAudioDeltas":
-				return response()->json(\App\SAFEReverbAudioDeltas::where('ID','=',$id)->get());
-				break;
-			case "SAFEReverbAudioFeatureData":
-				return response()->json(\App\SAFEReverbAudioFeatureData::where('ID','=',$id)->get());
-				break;
-			case "SAFEReverbAudioUserData":
-				return response()->json(\App\SAFEReverbAudioUserData::where('ID','=',$id)->get());
-				break;
-			default:
-				return 'That plugin doesn\'t exist bro' ;
+			case 'matlab':
+				return json_encode($json_array);
 				break;
 		}
 	}

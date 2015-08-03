@@ -20,5 +20,21 @@ class SAFECompressorAudioFeatureData extends Model
      */
     public $timestamps = false;
 
+    /**
+     * Relationships
+     *
+     */
 
+    public function userdata(){
+        return $this->belongsTo('\App\SAFECompressorUserData','ID','ID');
+    }
+
+    /**
+     * Functions
+     *
+     */
+
+    public function isProcessed(){
+        return ($this->SignalState == 'processed' ? true : false);
+    }
 }

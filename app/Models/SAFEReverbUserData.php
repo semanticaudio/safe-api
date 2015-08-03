@@ -4,14 +4,14 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class SAFEEqualiserUserData extends Model
+class SAFEReverbUserData extends Model
 {
     /**
      * The database table used by the model.
      *
      * @var string
      */
-	protected $table = 'SAFEEqualiserUserData';
+	protected $table = 'SAFEReverbUserData';
     
     /**
      * Indicates if the model should be timestamped.
@@ -26,12 +26,12 @@ class SAFEEqualiserUserData extends Model
      */
 
     public function deltas(){
-        return $this->hasMany('\App\SAFEEqualiserDeltas','ID','ID');
+        return $this->hasMany('\App\SAFEReverbDeltas','ID','ID');
     }
     public function deltadeltas(){
-        return $this->hasMany('\App\SAFEEqualiserDeltaDeltas','ID','ID');
+        return $this->hasMany('\App\SAFEReverbDeltaDeltas','ID','ID');
     }
     public function audiofeaturedata(){
-        return $this->hasMany('\App\SAFEEqualiserAudioFeatureData','ID','ID');
+        return $this->hasMany('\App\SAFEReverbAudioFeatureData','ID','ID');
     }
 }

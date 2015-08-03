@@ -19,4 +19,22 @@ class SAFEEqualiserAudioFeatureData extends Model
      * @var bool
      */
     public $timestamps = false;
+
+     /**
+     * Relationships
+     *
+     */
+
+    public function userdata(){
+        return $this->belongsTo('\App\SAFEEqualiserUserData','ID','ID');
+    }
+
+    /**
+     * Functions
+     *
+     */
+
+    public function isProcessed(){
+        return ($this->SignalState == 'processed' ? true : false);
+    }
 }

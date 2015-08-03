@@ -19,4 +19,19 @@ class SAFEDistortionUserData extends Model
      * @var bool
      */
     public $timestamps = false;
+
+    /**
+     * Relationships
+     *
+     */
+
+    public function deltas(){
+        return $this->hasMany('\App\SAFEDistortionDeltas','ID','ID');
+    }
+    public function deltadeltas(){
+        return $this->hasMany('\App\SAFEDistortionDeltaDeltas','ID','ID');
+    }
+    public function audiofeaturedata(){
+        return $this->hasMany('\App\SAFEDistortionAudioFeatureData','ID','ID');
+    }
 }
