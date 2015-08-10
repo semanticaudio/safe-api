@@ -30,7 +30,11 @@ class SAFEController extends BaseController
      */
 	public function exportPluginID($plugin,$format, Request $request){
 		ini_set('memory_limit','-1');
-		$terms = json_decode($request->input('data', null))->terms;
+		header('Access-Control-Allow-Origin: *');
+	    header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+	    header('Access-Control-Allow-Headers: Origin, Content-Type, Accept, Authorization, X-Request-With');
+	    header('Access-Control-Allow-Credentials: true');
+		$terms = json_decode($request->input('terms', null));
 		$ids = array();
 		$result = array();
 		foreach ($terms as $term) {
