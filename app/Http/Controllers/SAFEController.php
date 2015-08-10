@@ -11,16 +11,60 @@ use SoapBox\Formatter\Formatter;
 
 class SAFEController extends BaseController
 {
+
 	public function index(){
 		return '<img src="http://media.giphy.com/media/13d2jHlSlxklVe/giphy.gif">';
 	}
-
 	/**
      * 
  	 * Version 1 - 💣 Super Hyper Alpha 💣
      * 
+     * GET
+     * 
+     * $plugin string
+     * $format string
+     * 
+     * POST
+     * 
+     * descriptors - Array of Strings
      */
-	public function exportPluginID($plugin,$id,$format){
+	public function exportPluginID($plugin,$format, Request $request){
+		ini_set('memory_limit','-1');
+		$terms = json_decode($request->input('data', null))->terms;
+		$ids = array();
+		$result = array();
+		foreach ($terms as $term) {
+			switch ($plugin) {
+				case "SAFECompressor":
+					foreach (\App\SAFECompressorUserData::where('Descriptors','LIKE',$term)->take(5)->get() as $termobj) {
+						array_push($ids,$termobj->ID);
+					}
+					unset($termobj);
+					break;
+				case "SAFEDistortion":
+					foreach (\App\SAFEDistortionUserData::where('Descriptors','LIKE',$term)->take(5)->get() as $termobj) {
+						array_push($ids,$termobj->ID);
+					}
+					unset($termobj);
+					break;
+				case "SAFEEqualiser":
+					foreach (\App\SAFEEqualiserUserData::where('Descriptors','LIKE',$term)->take(5)->get() as $termobj) {
+						array_push($ids,$termobj->ID);
+					}
+					unset($termobj);
+					break;
+				case "SAFEReverb":
+					foreach (\App\SAFEReverbUserData::where('Descriptors','LIKE',$term)->take(5)->get() as $termobj) {
+						array_push($ids,$termobj->ID);
+					}
+					unset($termobj);
+					break;
+				default:
+					return 'That plugin doesn\'t exist bro' ;
+					break;
+			}
+		}
+		foreach ($ids as $id) {
 			switch ($plugin) {
 				case "SAFECompressor":
 					$deltas = \App\SAFECompressorUserData::find($id)->deltas;
@@ -50,44 +94,53 @@ class SAFEController extends BaseController
 					return 'That plugin doesn\'t exist bro' ;
 					break;
 			}
-		$resultarray = [
-			'userdata' => $userdata,
-			"deltas" => [
-				"processed" => $deltas->filter(function($item){
-				    return $item->isProcessed();
-				})->values()->values(),
-				"unprocessed" => $deltas->filter(function($item){
-				    return !$item->isProcessed();
-				})->values()->values()
-			],
-			"deltadeltas" => [
-				"processed" => $deltadeltas->filter(function($item){
-				    return $item->isProcessed();
-				})->values()->values(),
-				"unprocessed" => $deltadeltas->filter(function($item){
-				    return !$item->isProcessed();
-				})->values()->values()
-			],
-			"audiofeaturedata" => [
-				"processed" => $audiofeaturedata->filter(function($item){
-				    return $item->isProcessed();
-				})->values()->values(),
-				"unprocessed" => $audiofeaturedata->filter(function($item){
-				    return !$item->isProcessed();
-				})->values()->values()
-			]
-		];
-
+			$temp = [
+				'ID' => $id,
+				'userdata' => $userdata,
+				"deltas" => [
+					"processed" => $deltas->filter(function($item){
+					    return $item->isProcessed();
+					})->values()->values(),
+					"unprocessed" => $deltas->filter(function($item){
+					    return !$item->isProcessed();
+					})->values()->values()
+				],
+				"deltadeltas" => [
+					"processed" => $deltadeltas->filter(function($item){
+					    return $item->isProcessed();
+					})->values()->values(),
+					"unprocessed" => $deltadeltas->filter(function($item){
+					    return !$item->isProcessed();
+					})->values()->values()
+				],
+				"audiofeaturedata" => [
+					"processed" => $audiofeaturedata->filter(function($item){
+					    return $item->isProcessed();
+					})->values()->values(),
+					"unprocessed" => $audiofeaturedata->filter(function($item){
+					    return !$item->isProcessed();
+					})->values()->values()
+				]
+			];
+			array_push($result,$temp);
+			unset($temp);
+			unset($deltas);
+			unset($deltadeltas);
+			unset($audiofeaturedata);
+			unset($userdata);
+		}
+		unset($ids);
 		switch ($format) {
 			case 'json':
-				return json_encode($resultarray);
+				return response(json_encode($result),'200')->header('Content-Type', 'application/json');
 				break;
 			case 'xml':
-				$formatter = Formatter::make(json_encode($resultarray), Formatter::JSON);
+				$formatter = Formatter::make(json_encode($result), Formatter::JSON);
 				return response($formatter->toXml(),'200')->header('Content-Type', 'text/xml');
 				break;
-			case 'matlab':
-				return json_encode($json_array);
+			case 'csv':
+				$formatter = Formatter::make($result, Formatter::ARR);
+				return response($formatter->toCsv(),'200');
 				break;
 		}
 	}

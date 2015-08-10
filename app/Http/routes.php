@@ -13,4 +13,5 @@
 
 $app->get('/', 'SAFEController@index');
 $app->get('/api/v1/', 'SAFEController@index');
-$app->get('/api/v1/{plugin}/{id}/{format}', 'SAFEController@exportPluginID');
+
+$app->post('/api/v1/{plugin}/{format}', 'SAFEController@exportPluginID');
