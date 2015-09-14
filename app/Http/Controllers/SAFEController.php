@@ -446,7 +446,7 @@ class SAFEController extends BaseController{
 					case 'all':
 						$requested_term = \App\SAFECompressorUserData::find($id);
 						$requested_data = [
-							'userdata' => $requested_term,
+							'userdata' => \App\SAFECompressorUserData::find($id),
 							"deltas" => [
 								"processed" => $requested_term->deltas->filter(function($item){
 								    return $item->isProcessed();
@@ -513,7 +513,7 @@ class SAFEController extends BaseController{
 					case 'all':
 						$requested_term = \App\SAFEDistortionUserData::find($id);
 						$requested_data = [
-							'userdata' => $requested_term,
+							'userdata' => \App\SAFEDistortionUserData::find($id),
 							"deltas" => [
 								"processed" => $requested_term->deltas->filter(function($item){
 								    return $item->isProcessed();
@@ -580,7 +580,7 @@ class SAFEController extends BaseController{
 					case 'all':
 						$requested_term = \App\SAFEEqualiserUserData::find($id);
 						$requested_data = [
-							'userdata' => $requested_term,
+							'userdata' => \App\SAFEEqualiserUserData::find($id),
 							"deltas" => [
 								"processed" => $requested_term->deltas->filter(function($item){
 								    return $item->isProcessed();
@@ -647,7 +647,7 @@ class SAFEController extends BaseController{
 					case 'all':
 						$requested_term = \App\SAFEReverbUserData::find($id);
 						$requested_data = [
-							'userdata' => $requested_term,
+							'userdata' => \App\SAFEReverbUserData::find($id),
 							"deltas" => [
 								"processed" => $requested_term->deltas->filter(function($item){
 								    return $item->isProcessed();
