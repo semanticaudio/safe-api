@@ -12,6 +12,8 @@ class SAFECompressorUserData extends Model
      * @var string
      */
 	protected $table = 'SAFECompressorUserData';
+
+    protected $hidden = ['usrIP'];
     
     /**
      * Indicates if the model should be timestamped.

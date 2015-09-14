@@ -13,6 +13,8 @@ class SAFEEqualiserUserData extends Model
      */
 	protected $table = 'SAFEEqualiserUserData';
     
+    protected $hidden = ['usrIP'];
+
     /**
      * Indicates if the model should be timestamped.
      *

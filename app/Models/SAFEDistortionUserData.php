@@ -12,6 +12,8 @@ class SAFEDistortionUserData extends Model
      * @var string
      */
 	protected $table = 'SAFEDistortionUserData';
+
+    protected $hidden = ['usrIP'];
     
     /**
      * Indicates if the model should be timestamped.

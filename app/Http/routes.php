@@ -12,6 +12,9 @@
 */
 
 $app->get('/', 'SAFEController@index');
-$app->get('/api/v1/', 'SAFEController@index');
+$app->get('/v1/', 'SAFEController@index');
 
-$app->post('/api/v1/{plugin}/{format}', 'SAFEController@exportPluginID');
+// V1
+$app->post('/v1/{plugin}/{format}', 'SAFEController@listUserData');
+$app->get('/v1/{plugin}/term-list.json', 'SAFEController@termList');
+$app->get('/v1/{plugin}/{datatype}/{id}/{format}', 'SAFEController@getDatafromID');

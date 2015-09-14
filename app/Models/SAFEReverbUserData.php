@@ -13,6 +13,7 @@ class SAFEReverbUserData extends Model
      */
 	protected $table = 'SAFEReverbUserData';
     
+    protected $hidden = ['usrIP'];
     /**
      * Indicates if the model should be timestamped.
      *
