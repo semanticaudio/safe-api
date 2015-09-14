@@ -101,7 +101,7 @@ http://api.semanticaudio.co.uk/SAFEEqualiser/json
 ##### curl Example
 ```bash
 curl --request POST 'http://api.semanticaudio.co.uk/v1/SAFEEqualiser/json' --data 'terms=["agressive"]'
-``
+```
 
 #### Response
 
@@ -174,7 +174,7 @@ http://api.semanticaudio.co.uk/v1/SAFEEqualiser/all/226/json
 
 ```bash
 curl --request GET 'http://api.semanticaudio.co.uk/v1/SAFEEqualiser/all/226/json'
-``
+```
 
 ##### Response
 
